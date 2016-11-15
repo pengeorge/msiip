@@ -1,0 +1,73 @@
+#!/bin/bash
+# Request for a local resource (tensorflow/gpu)
+# This script should be executed in a shared directory.
+set -e
+mem=0M           # memory
+time=180         # time (in minutes)
+res=tensorflow   # resource (tensorflow/gpu)
+vram=all         # default to take all TODO request for vram_free
+logdir=qlog
+logfile=
+
+help_message="Usage: $0 [opts]
+ e.g.: $0 --mem 2G --time 180
+Options
+  --res <tensorflow|gpu>   default: tensorflow
+  --time <time in minutes> default: 180
+  --mem <memory requested> default: 0M"
+. parse_options.sh
+
+# Handle shortcut
+case $res in
+  tf) res=tensorflow ;;
+  g) res=gpu;;
+  *)
+esac
+
+[[ ' tensorflow gpu ' =~ " $res " ]] ||\
+  (echo "$0: Resource '$res' is not supported."; exit 1;)
+
+local_q=$(hostname | sed 's/server//')
+echo "Requesting for $res on $local_q for $time minutes"
+#echo "Resource: $res Queue: $local_q Time: $time min"
+
+while :; do
+  check.sh --res $res --wait true $local_q
+  # For local resources, check .lock file in case someone just gets it but still in 'qw' state
+  if [ -f /tmp/.lock.$res ] ; then
+    echo "Request failed. Possibly someone just took it. Start waiting again..."
+  else
+    touch /tmp/.lock.$res
+    break
+  fi
+  sleep 15
+done
+local_q=${local_q}.q
+
+echo -e "\nGot it at `date`"
+if [ -z $logfile ]; then
+  logfile=$logdir/request_${res}_on_$(hostname | sed 's/server//')_`date '+%Y%m%d%H%M%S'`.log
+fi
+[ -f $logfile ] && echo "$logfile exists." && exit 1;
+# Something to do on EXIT
+done=false
+trap "
+rm -f /tmp/.lock.$res
+if \$done; then
+  echo Time up! $res released at \`date\`
+  exit 0
+fi
+" EXIT
+## qdel has already been executed in queue
+#echo
+#job_id=\`head -n 1 ${logdir}/q/$(basename $logfile) | grep -Po '(?<=^Your job )\d+'\` ||\
+#  (echo 'Cannot get job_id, please qdel manually.'; exit 1;)
+#qdel \$job_id
+
+l_opt="ram_free=${mem},mem_free=${mem},${res}=1"
+[ $res == tensorflow ] && l_opt="${l_opt},gpu=1"
+
+queue.pl --qdel-on-Eqw -q $local_q -l $l_opt $logfile sleep $[time*60]
+done=true
+exit 0
+

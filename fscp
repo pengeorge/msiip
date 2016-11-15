@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Copyright 2015 pengeorge
+
+if [ $# != 2 ]; then
+  echo "Usage: fscp [options] <local-file> <remote-host>:<remote-dir>"
+  echo "       where <local-file> may be a directory, will be copied to <remote-dir>/"
+  echo "       similar to: scp -r <local-file> <remote-host>:<remote-dir>/"
+  exit 1;
+fi
+
+file=$1
+remote=$2
+
+host=${remote%%:*}
+dir=${remote##*:}
+
+tar czf - $file | ssh $host "tar xzf - -C $dir/"
+
