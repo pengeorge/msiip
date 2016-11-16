@@ -279,6 +279,7 @@ job-ID  prior   name       user         state submit/start at     queue         
 ### 复杂命令的调用方法
 任务的执行命令传递到tf/queue等脚本中可能存在特殊字符转换的问题，举几个例子。
 - 复杂命令样例1：带重定向或管道等特殊符号
+  
   例如下面这条命令
   ``` bash
   $ cat /etc/passwd | grep ^chen > ./user_chen.txt
@@ -303,7 +304,9 @@ job-ID  prior   name       user         state submit/start at     queue         
   chenzp:x:1001:1001:,,,:/home/chenzp:/bin/bash
   chenty:x:1003:1001:,,,:/home/chenty:/bin/bash
   ```
+
 - 复杂命令样例2：带引号的命令
+
   例如下面这条命令
   ``` bash
   $ ./complicated.sh --op1 new_op1 --op2 "op2 with spaces" arg1_value "arg2 value with spaces"
