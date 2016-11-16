@@ -7,7 +7,7 @@ quiet=true
 log=
 
 help_message="Usage: $0 [opts] <command>
- e.g.: $0
+ e.g.: $0 --log mylog.txt sleep 60
 Options
   --local-only <true|false>   if true, only use local TensorFlow
                               (default: true)

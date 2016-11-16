@@ -1,4 +1,7 @@
+core
 qlog
 q
 examples/qlog
 examples/data
+examples/core
+.*.swp
