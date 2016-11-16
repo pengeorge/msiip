@@ -14,11 +14,11 @@ Grid Engine中记录了每台服务器的资源数量或大小，例如gpu=1,ten
 
 ## 调用方法
 
-### 方法1. 一段时间内独享
+### 方法1: 一段时间内独享
 请求本地资源在一段时间内的独享权。这种模式下会在本地执行一个sleep任务，声明对资源的占用。
 之后可以以任意方式使用。
 
-**适合场景**：小规模数据上调试程序，需要频繁修改代码和测试。
+**适用场景**：小规模数据上调试程序，需要频繁修改代码和测试。
 
 长时间的任务建议用其他调用方法。
 
@@ -26,9 +26,10 @@ Grid Engine中记录了每台服务器的资源数量或大小，例如gpu=1,ten
 建议不用的时候 **Ctrl-c** 提前释放资源（吃饭、睡觉 etc.）。
 
 **基本用法**：request [opts]
+
 **完整用法**: `$ request -h`
 
-- 实例1：占用成功
+- 实例1：请求成功
 ``` bash
 $ request --mem 120
 ```
@@ -41,7 +42,7 @@ Job has been submitted. Use 'qstat' to track the state.
 Now running...
 (log files: qlog/request_tensorflow_on_x22_20161116103650.log)
 ```
-- 实例2：占用失败，显示当前占用该资源的任务和用户，进入等待状态
+- 实例2：请求失败，显示当前占用该资源的任务和用户，进入等待状态
 ``` bash
 $ request
 ```
@@ -65,15 +66,16 @@ Waiting... (0 min)
 
 ```
 
-###方法2. 本地执行 (TensorFlow) (推荐)
+### 方法2: 本地执行 (TensorFlow) (推荐)
 用本地资源执行任务，可以即时打印stdout和stderr，同时把stdout的输出写到log文件中（默认为qlog/job\_xxxxxx.log）。任务完成后自动释放资源。
 
-**适合场景**：比较耗时的任务，需要关注即时输出的时候。
+**适用场景**：比较耗时的任务，需要关注即时输出的时候。
 
 **基本用法**： tf [opts] \<your-command\> \[your-command-opts\] \[your-command-args\]
+
 **完整用法**: `$ tf -h`
 
-实例1：本地资源可用时正常执行
+- 实例1：本地资源可用时正常执行
 ``` bash
 $ tf ./convolutional.py
 ```
@@ -94,7 +96,7 @@ Terminated
 ```
 （这个方法最后可能会输出一些Terminated等信息，是正常现象）
 
-实例2：本地资源不可用时中断，建议尝试“方法3“，使用其他机器的资源
+- 实例2：本地资源不可用时中断，建议尝试“方法3“，使用其他机器的资源
 ``` bash
 $ tf ./convolutional.py
 ```
@@ -117,10 +119,10 @@ Local TensorFlow is not available.
 Try '/home/share/bin/tf --local-only false <log-file> <command>'
 ```
 
-###方法3. 自动分配 (TensorFlow)
+### 方法3: 自动分配 (TensorFlow)
 这种调用方法首先会尝试方法2，若本地资源不可用，任务会被提交到Grid Engine执行，自动请求空闲机器的资源。
 
-**适合场景**：批量运行的TensorFlow实验；或尝试方法2失败时。
+**适用场景**：批量运行的TensorFlow实验；或尝试方法2失败时。
 
 **缺点**：
 - 方法3、4、5无法在前端即时打印输出，需要打开log文件查看。可以用下面命令每隔5秒自动刷新：
@@ -130,7 +132,7 @@ $ while :; do clear; tail <path-to-log>; sleep 5; done
   请远程到log文件实际所在的机器执行该命令，减少网络传输。
 - 若执行任务的机器和数据所在机器不同，I/O密集时会阻塞网络。
 
-实例：
+**实例**
 ``` bash
 $ tf --local-only false ./convolutional.py
 ```
@@ -157,7 +159,7 @@ Now running...
 Job finished.
 ```
 
-log文件中保存了任务的所有标准输出和标准错误输出、执行任务的机器、开始时间、结束时间、退出状态。
+log文件中保存了任务的所有stdout和stderr输出、执行任务的机器、开始时间、结束时间、退出状态。
 ``` bash
 $ head ./qlog/job_20161116143235.log
 ```
@@ -189,41 +191,41 @@ Test error: 0.8%
 # Finished at Wed Nov 16 14:34:39 CST 2016 with status 0
 ```
 
-###注意事项
-1. 方法3、4、5实际执行任务的机器未知，因此要求与任务相关的程序和数据等放在NFS共享目录下，对所有机器可见，具体包括：
-
+### 注意事项
+* 方法3、4、5实际执行任务的机器未知，因此要求与任务相关的程序和数据等放在NFS共享目录下，对所有机器可见，具体包括：
 - 任务相关的可执行程序和脚本。对于Python脚本，依赖的库需要在所有机器上支持，C/C++程序连接的so文件在所有机器上存在且版本一致
 - 输入文件和输出文件
 - 当前目录。任务执行过程中需要在./qlog目录下写log文件
+* 显卡资源紧张，尽量将无需使用显卡的耗时操作独立出来（如数据预处理、后处理等等），只对必要的环节请求资源。
 
-2. 显卡资源紧张，尽量将无需使用显卡的耗时操作独立出来（如数据预处理、后处理等等），只对必要的环节请求资源。
-
-###方法4. 自动分配 (通用)
+### 方法4: 自动分配 (通用)
 可以指定执行任务的服务器（群），请求内存、GPU、TensorFlow等资源。
 
 **基本用法**： queue [opts] \<log-file\> \<your-command\> \[your-command-opts\] \[your-command-args\]
+
 **完整用法**: `$ queue -h`
 
-实例1：运行其他需要要GPU支持的程序
+- 实例1：运行其他需要要GPU支持的程序
 ``` bash
 $ queue -l gpu=1 <a-gpu-required-program>
 ```
 
-实例2: 内存需求较大的任务
+- 实例2: 内存需求较大的任务
 ``` bash
 $ queue -l ram_free=10G,mem_free=10G <a-memory-killer-program>
 ```
 
-实例3：在x34上处理x32通过NFS共享过来的大量数据，指定使用x32计算，避免网络传输
+- 实例3：在x34上处理x32通过NFS共享过来的大量数据，指定使用x32计算，避免网络传输
 ``` bash
 $ queue -q x32.q -l ram_free=1G,mem_free=1G data-processer /home/share/my_big_data.dat /home/share/my_output.txt
 ```
 
-###方法5. 多任务并行
+###方法5: 多任务并行
 把任务分成若干份，提交到Grid Engine，实现多机多核并行计算，最后汇总。
 请求资源（每一份任务需要的资源）的方法同上。
 
 **基本用法**： queue [opts] JOB=1:n \<log-file-JOB\> \<your-command\> \[your-command-opts\] \[your-command-args\]
+
 **完整用法**: `$ queue -h`
 
 实例：统计文本中词的总数
@@ -350,16 +352,13 @@ Options:
 ```
 
 
-# Grid Engine
-
-常用命令
-----------
+# Grid Engine 常用命令
 * qstat 查看任务状态
-** 列出我的任务  `$ qstat`
-** 列出所有用户任务  `$ qstat -u '*'`
-** 查看某任务信息  `$ qstat -j <job-ID>`
-** 查看某资源在某机器上的信息  `$ qstat -F tf -q x22.q`
-** 常见state：正在运行 (r)、等待中 (qw)、出错 (Eqw)、挂起 (s)
+- 列出我的任务  `$ qstat`
+- 列出所有用户任务  `$ qstat -u '*'`
+- 查看某任务信息  `$ qstat -j <job-ID>`
+- 查看某资源在某机器上的信息  `$ qstat -F tf -q x22.q`
+- 常见state：正在运行 (r)、等待中 (qw)、出错 (Eqw)、挂起 (s)
 * qdel 删除任务  `$ qdel <job-ID>`
 * qsub 提交任务（已封装进queue）
 * qhost 查看所有机器状态（CPU、内存、交换区）
