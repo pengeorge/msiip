@@ -192,11 +192,11 @@ Test error: 0.8%
 ```
 
 ### 注意事项
-- 方法3、4、5实际执行任务的机器未知，因此要求与任务相关的程序和数据等放在NFS共享目录下，对所有机器可见，具体包括：
- - 任务相关的可执行程序和脚本。对于Python脚本，依赖的库需要在所有机器上支持，C/C++程序连接的so文件在所有机器上存在且版本一致
+- 方法3、4、5实际执行任务的机器未知，因此要求把任务相关的程序和数据放在NFS共享目录下，对所有机器可见，具体包括：
+ - 任务相关的可执行程序和脚本。Python脚本的依赖库需要在所有机器上支持，C/C++程序连接的so文件需要在所有机器上存在且版本一致
  - 输入文件和输出文件
  - 当前目录。任务执行过程中需要在./qlog目录下写log文件
-- 显卡资源紧张，尽量将无需使用显卡的耗时操作独立出来（如数据预处理、后处理等等），只对必要的环节请求资源。
+- 显卡资源紧张，尽量将不需要使用显卡的耗时操作独立出来（如数据预处理、后处理等等），只对必要的环节请求资源。
 
 ### 方法4: 自动分配 (通用)
 可以指定执行任务的服务器（群），请求内存、GPU、TensorFlow等资源。
@@ -230,9 +230,10 @@ $ queue -q x32.q -l ram_free=1G,mem_free=1G data-processer /home/share/my_big_da
 
 - 实例：统计文本中词的总数
 
-首先将文本数据分成7份：data/text/text.1.txt ~ data/text/text.7.txt。
+首先将文本数据分成7份：data/text/text.1.txt ~ data/text/text.7.txt，
+在queue的参数中加入JOB=1:7，输入文件用data/text/text.JOB.txt表示，相应的log文件和输出文件名也要带上JOB加以区分
 
-处理每份数据用的脚本wordcount.sh：
+处理每份数据用的脚本wordcount.sh
 ``` bash
 #!/bin/bash
 # wordcount.sh
@@ -275,6 +276,53 @@ job-ID  prior   name       user         state submit/start at     queue         
  810088 0.50000 wordcount. chenzp       r     11/16/2016 15:43:54 all.q@serverx34.msiip.thu.edu      1 6
  810088 0.50000 wordcount. chenzp       r     11/16/2016 15:43:54 all.q@serverx29.msiip.thu.edu      1 7
 ```
+### 复杂命令的调用方法
+任务的执行命令传递到tf/queue等脚本中时可能存在特殊转换的问题，下面举几个例子。
+- 复杂命令样例1：带重定向或管道等特殊符号
+  例如下面这条命令
+  ``` bash
+  $ cat /etc/passwd | grep ^chen > ./user_chen.txt
+  ```
+  用tf调用时，可以对整句命令加引号
+  ``` bash
+  $ tf 'cat /etc/passwd | grep ^chen > ./user_chen.txt'
+  ```
+  或者只对特殊符号加引号
+  ``` bash
+  $ tf cat /etc/passwd '|' grep ^chen '>' ./user_chen.txt
+  ```
+
+  用queue调用时，只能在特殊符号外加单引号
+  ``` bash
+  $ queue qlog/find_chen.log cat /etc/passwd '|' grep ^chen '>' ./user_chen.txt
+  ```
+  ``` bash
+  $ cat ./user_chen.txt
+  ```
+  ``` plain
+  chenzp:x:1001:1001:,,,:/home/chenzp:/bin/bash
+  chenty:x:1003:1001:,,,:/home/chenty:/bin/bash
+  ```
+- 复杂命令样例2：带引号的命令
+  ``` bash
+  $ ./complicated.sh --op1 new_op1 --op2 "op2 with spaces" arg1_value "arg2 value with spaces"
+  ```
+  输出
+  ``` plain
+  op1 = new_op1
+  op2 = op2 with spaces
+  op3 = default_op3
+  arg1 = arg1_value
+  arg2 = arg2 value with spaces
+  ```
+  用tf调用，对整句命令加引号
+  ``` bash
+  $ tf './complicated.sh --op1 new_op1 --op2 "op2 with spaces" arg1_value "arg2 value with spaces"'
+  ```
+
+*选项和参数过于复杂的命令，建议包装在shell脚本里，再用tf/queue调用*
+
+
 
 =================================================================================
 
@@ -326,7 +374,7 @@ Options
 ```
 
 ###queue用法
-提交任务到Grid Engine，可以灵活请求资源，可以多机多CPU并行
+提交任务到Grid Engine，可以灵活请求资源，可以多机多核并行
 ``` bash
 $ queue -h
 ```
