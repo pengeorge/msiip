@@ -353,14 +353,14 @@ Options:
 
 
 # Grid Engine 常用命令
-* qstat 查看任务状态
-- 列出我的任务  `$ qstat`
-- 列出所有用户任务  `$ qstat -u '*'`
-- 查看某任务信息  `$ qstat -j <job-ID>`
-- 查看某资源在某机器上的信息  `$ qstat -F tf -q x22.q`
-- 常见state：正在运行 (r)、等待中 (qw)、出错 (Eqw)、挂起 (s)
-* qdel 删除任务  `$ qdel <job-ID>`
-* qsub 提交任务（已封装进queue）
-* qhost 查看所有机器状态（CPU、内存、交换区）
-* 查看某机器的资源总量  `$ qconf -se serverx22 | grep complex_values`
+- qstat 查看任务状态
+ - 列出我的任务  `$ qstat`
+ - 列出所有用户任务  `$ qstat -u '*'`
+ - 查看某任务信息  `$ qstat -j <job-ID>`
+ - 查看某资源在某机器上的信息  `$ qstat -F tf -q x22.q`
+ - 常见state：正在运行 (r)、等待中 (qw)、出错 (Eqw)、挂起 (s)
+- qdel 删除任务  `$ qdel <job-ID>`
+- qsub 提交任务（已封装进queue）
+- qhost 查看所有机器状态（CPU、内存、交换区）
+- 查看某机器的资源总量  `$ qconf -se serverx22 | grep complex_values`
 
