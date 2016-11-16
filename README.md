@@ -125,10 +125,10 @@ Try '/home/share/bin/tf --local-only false <log-file> <command>'
 **适用场景**：批量运行的TensorFlow实验；或尝试方法2失败时。
 
 **缺点**
-- 方法3、4、5无法在前端即时打印输出，需要打开log文件查看。可以用下面命令每隔5秒自动刷新：
-``` bash
-$ while :; do clear; tail <path-to-log>; sleep 5; done
-```
+- 方法3、4、5无法在前端即时打印输出，需要打开log文件查看。可以用下面命令打印最后100行log，每隔5秒刷新
+  ``` bash
+  $ while :; do clear; tail -n 100 <path-to-log>; sleep 5; done
+  ```
   请远程到log文件实际所在的机器执行该命令，减少网络传输。
 - 若执行任务的机器和数据所在机器不同，I/O密集时会阻塞网络。
 
