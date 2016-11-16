@@ -277,7 +277,7 @@ job-ID  prior   name       user         state submit/start at     queue         
  810088 0.50000 wordcount. chenzp       r     11/16/2016 15:43:54 all.q@serverx29.msiip.thu.edu      1 7
 ```
 ### 复杂命令的调用方法
-任务的执行命令传递到tf/queue等脚本中时可能存在特殊转换的问题，下面举几个例子。
+任务的执行命令传递到tf/queue等脚本中可能存在特殊字符转换的问题，举几个例子。
 - 复杂命令样例1：带重定向或管道等特殊符号
   例如下面这条命令
   ``` bash
@@ -304,6 +304,7 @@ job-ID  prior   name       user         state submit/start at     queue         
   chenty:x:1003:1001:,,,:/home/chenty:/bin/bash
   ```
 - 复杂命令样例2：带引号的命令
+  例如下面这条命令
   ``` bash
   $ ./complicated.sh --op1 new_op1 --op2 "op2 with spaces" arg1_value "arg2 value with spaces"
   ```
