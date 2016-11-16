@@ -27,7 +27,7 @@ Grid Engine中记录了每台服务器的资源数量或大小，例如gpu=1,ten
 
 **基本用法**：request [opts]
 
-**完整用法**: `$ request -h`
+**完整用法**：`$ request -h`
 
 - 实例1：请求成功
 ``` bash
@@ -73,7 +73,7 @@ Waiting... (0 min)
 
 **基本用法**： tf [opts] \<your-command\> \[your-command-opts\] \[your-command-args\]
 
-**完整用法**: `$ tf -h`
+**完整用法**： `$ tf -h`
 
 - 实例1：本地资源可用时正常执行
 ``` bash
@@ -124,7 +124,7 @@ Try '/home/share/bin/tf --local-only false <log-file> <command>'
 
 **适用场景**：批量运行的TensorFlow实验；或尝试方法2失败时。
 
-**缺点**：
+**缺点**
 - 方法3、4、5无法在前端即时打印输出，需要打开log文件查看。可以用下面命令每隔5秒自动刷新：
 ``` bash
 $ while :; do clear; tail <path-to-log>; sleep 5; done
@@ -192,18 +192,18 @@ Test error: 0.8%
 ```
 
 ### 注意事项
-* 方法3、4、5实际执行任务的机器未知，因此要求与任务相关的程序和数据等放在NFS共享目录下，对所有机器可见，具体包括：
-- 任务相关的可执行程序和脚本。对于Python脚本，依赖的库需要在所有机器上支持，C/C++程序连接的so文件在所有机器上存在且版本一致
-- 输入文件和输出文件
-- 当前目录。任务执行过程中需要在./qlog目录下写log文件
-* 显卡资源紧张，尽量将无需使用显卡的耗时操作独立出来（如数据预处理、后处理等等），只对必要的环节请求资源。
+- 方法3、4、5实际执行任务的机器未知，因此要求与任务相关的程序和数据等放在NFS共享目录下，对所有机器可见，具体包括：
+ - 任务相关的可执行程序和脚本。对于Python脚本，依赖的库需要在所有机器上支持，C/C++程序连接的so文件在所有机器上存在且版本一致
+ - 输入文件和输出文件
+ - 当前目录。任务执行过程中需要在./qlog目录下写log文件
+- 显卡资源紧张，尽量将无需使用显卡的耗时操作独立出来（如数据预处理、后处理等等），只对必要的环节请求资源。
 
 ### 方法4: 自动分配 (通用)
 可以指定执行任务的服务器（群），请求内存、GPU、TensorFlow等资源。
 
 **基本用法**： queue [opts] \<log-file\> \<your-command\> \[your-command-opts\] \[your-command-args\]
 
-**完整用法**: `$ queue -h`
+**完整用法**：`$ queue -h`
 
 - 实例1：运行其他需要要GPU支持的程序
 ``` bash
@@ -226,9 +226,9 @@ $ queue -q x32.q -l ram_free=1G,mem_free=1G data-processer /home/share/my_big_da
 
 **基本用法**： queue [opts] JOB=1:n \<log-file-JOB\> \<your-command\> \[your-command-opts\] \[your-command-args\]
 
-**完整用法**: `$ queue -h`
+**完整用法**：`$ queue -h`
 
-实例：统计文本中词的总数
+- 实例：统计文本中词的总数
 
 首先将文本数据分成7份：data/text/text.1.txt ~ data/text/text.7.txt。
 
