@@ -55,10 +55,6 @@ elif [ $ret == 0 ]; then # local available
   #jobs -p / jobs -pr / echo \$req_pid   (equivalent)
   job_id=\`head -n 1 ${logdir}/q/$(basename $req_logfile) | grep -Po '(?<=^Your job )\d+'\` ||\
     echo 'Cannot get job_id, please qdel manually.'
-  #ps aux | grep \`jobs -p\`
-  #ps aux | grep $$
-  #trap - SIGTERM && kill -- \`jobs -p\`
-  #trap - SIGTERM && qdel \$job_id && kill -- -$$
   trap - SIGTERM && qdel \$job_id >$odes && kill 0
   " EXIT SIGINT SIGTERM
 
@@ -70,7 +66,7 @@ elif [ $ret == 0 ]; then # local available
   sleep 1
   eval "echo >$odes"
   echo "# Started at `date`" > $log
-  bash $shfile | tee -a $log
+  stdbuf -o0 bash $shfile | tee -a $log
   echo "# Finished at `date`" >> $log
   echo "Done. log was saved in $log" >&2
 else
