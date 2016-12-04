@@ -67,7 +67,11 @@ fi
 l_opt="ram_free=${mem},mem_free=${mem},${res}=1"
 [ $res == tensorflow ] && l_opt="${l_opt},gpu=1"
 
-queue.pl --qdel-on-Eqw -q $local_q -l $l_opt $logfile sleep $[time*60]
+if [ $time == unlimited ]; then
+  queue.pl --qdel-on-Eqw -q $local_q -l $l_opt $logfile /home/share/bin/inf_loop.sh
+else
+  queue.pl --qdel-on-Eqw -q $local_q -l $l_opt $logfile sleep $[time*60]
+fi
 done=true
 exit 0
 

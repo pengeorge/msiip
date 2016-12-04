@@ -60,7 +60,7 @@ elif [ $ret == 0 ]; then # local available
 
   shfile=${logdir}/q/$(basename $log).sh
   echo -e "#!/bin/bash\n$cmd\n" > $shfile
-  eval "request --logfile $req_logfile >$odes" ||\
+  eval "request --time unlimited --logfile $req_logfile >$odes" ||\
     echo "Error in requesting (code: $?), command is still running but resource occupation is not recorded." >&2 &
   req_pid=$!
   sleep 1
