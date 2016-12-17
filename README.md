@@ -116,7 +116,7 @@ $ tf ./convolutional.py
        Hard requested queues: x22.q
 
 Local TensorFlow is not available.
-Try '/home/share/bin/tf --local-only false <log-file> <command>'
+Try '/home/share/bin/tf --local-only false <command>'
 ```
 
 ### 方法3: 自动分配 (TensorFlow)

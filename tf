@@ -42,7 +42,7 @@ if [ $ret == 123 ]; then # local not available
   echo -e "$check_output\n" >&2
   echo "Local TensorFlow is not available." >&2
   if $local_only; then
-    echo "Try '$0 --local-only false <log-file> <command>'" >&2
+    echo "Try '$0 --local-only false <command>'" >&2
     exit 1;
   else
     echo "Submitting to queue..."
