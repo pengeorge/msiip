@@ -125,9 +125,9 @@ Try '/home/share/bin/tf --local-only false <command>'
 **适用场景**：批量运行的TensorFlow实验；或尝试方法2失败时。
 
 **缺点**
-- 方法3、4、5无法在前端即时打印输出，需要打开log文件查看。可以用下面命令打印最后100行log，每隔5秒刷新
+- 方法3、4、5无法在前端即时打印输出，需要打开log文件查看。
 ``` bash
-$ while :; do clear; tail -n 100 <path-to-log>; sleep 5; done
+$ tail -f <path-to-log>
 ```
   请远程到log文件实际所在的机器执行该命令，减少网络传输。
 - 若执行任务的机器和数据所在机器不同，I/O密集时会阻塞网络。
@@ -205,7 +205,7 @@ Test error: 0.8%
 
 **完整用法**：`$ queue -h`
 
-- 实例1：运行其他需要要GPU支持的程序
+- 实例1：运行其他需要GPU支持的程序
 ``` bash
 $ queue -l gpu=1 <a-gpu-required-program>
 ```
